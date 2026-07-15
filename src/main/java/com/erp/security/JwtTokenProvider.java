@@ -67,7 +67,7 @@ public class JwtTokenProvider {
                 .subject(subject)
                 .issuer(issuer)
                 .claim("userId", userDetails.getId())
-                .claim("email", userDetails.getEmail())
+                .claim("name", userDetails.getName())
                 .claim("roles", roles)
                 .claim("tokenType", tokenType)
                 .issuedAt(now)
@@ -77,9 +77,9 @@ public class JwtTokenProvider {
     }
 
     /**
-     * Extract username from a JWT token.
+     * Extract email (subject) from a JWT token.
      */
-    public String getUsernameFromToken(String token) {
+    public String getEmailFromToken(String token) {
         return Jwts.parser()
                 .verifyWith(key)
                 .build()

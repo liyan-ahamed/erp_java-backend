@@ -11,9 +11,9 @@ import java.util.Set;
  */
 public class RegisterRequest {
 
-    @NotBlank(message = "Username is required")
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
-    private String username;
+    @NotBlank(message = "Name is required")
+    @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
+    private String name;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be valid")
@@ -24,23 +24,20 @@ public class RegisterRequest {
     @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
     private String password;
 
-    @Size(max = 50, message = "First name must not exceed 50 characters")
-    private String firstName;
-
-    @Size(max = 50, message = "Last name must not exceed 50 characters")
-    private String lastName;
+    @Size(max = 20, message = "Phone must not exceed 20 characters")
+    private String phone;
 
     private Set<String> roles;
 
     public RegisterRequest() {
     }
 
-    public String getUsername() {
-        return username;
+    public String getName() {
+        return name;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {
@@ -59,20 +56,12 @@ public class RegisterRequest {
         this.password = password;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public Set<String> getRoles() {

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Custom UserDetailsService implementation that loads user data from the database.
+ * Loads users by email since email is the authentication identifier.
  */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -20,12 +21,17 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Load user by email address.
+     * Spring Security calls this method via the "username" parameter,
+     * but we use email as the authentication identifier.
+     */
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(
-                        "User not found with username: " + username));
+                        "User not found with email: " + email));
         return new CustomUserDetails(user);
     }
 }

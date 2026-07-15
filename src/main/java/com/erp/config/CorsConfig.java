@@ -12,18 +12,18 @@ import java.util.List;
 
 /**
  * CORS configuration for cross-origin requests.
- * Allows frontend applications to communicate with the API.
+ * Reads the allowed frontend origin from the FRONTEND_URL environment variable.
  */
 @Configuration
 public class CorsConfig {
 
-    @Value("${app.cors.allowed-origins:http://localhost:3000,http://localhost:4200}")
-    private String allowedOrigins;
+    @Value("${app.cors.frontend-url:http://localhost:3000}")
+    private String frontendUrl;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        configuration.setAllowedOrigins(Arrays.asList(frontendUrl.split(",")));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
         configuration.setExposedHeaders(List.of("Authorization"));

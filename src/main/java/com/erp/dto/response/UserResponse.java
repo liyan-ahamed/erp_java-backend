@@ -8,24 +8,21 @@ import java.util.Set;
 public class UserResponse {
 
     private Long id;
-    private String username;
+    private String name;
     private String email;
-    private String firstName;
-    private String lastName;
+    private String phone;
     private boolean active;
     private Set<String> roles;
 
     public UserResponse() {
     }
 
-    public UserResponse(Long id, String username, String email,
-                        String firstName, String lastName,
-                        boolean active, Set<String> roles) {
+    public UserResponse(Long id, String name, String email,
+                        String phone, boolean active, Set<String> roles) {
         this.id = id;
-        this.username = username;
+        this.name = name;
         this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.phone = phone;
         this.active = active;
         this.roles = roles;
     }
@@ -40,12 +37,12 @@ public class UserResponse {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getName() {
+        return name;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {
@@ -56,20 +53,12 @@ public class UserResponse {
         this.email = email;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public boolean isActive() {

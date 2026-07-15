@@ -38,27 +38,37 @@ public final class SecurityUtils {
     }
 
     /**
-     * Get the currently authenticated user's username.
+     * Get the currently authenticated user's email.
      *
-     * @return the username, or null if not authenticated
+     * @return the email, or null if not authenticated
      */
-    public static String getCurrentUsername() {
+    public static String getCurrentUserEmail() {
         CustomUserDetails userDetails = getCurrentUser();
-        return userDetails != null ? userDetails.getUsername() : null;
+        return userDetails != null ? userDetails.getEmail() : null;
     }
 
     /**
-     * Check if the current user has a specific role.
+     * Get the currently authenticated user's name.
      *
-     * @param role the role name (e.g., "ROLE_ADMIN")
-     * @return true if the user has the role
+     * @return the name, or null if not authenticated
      */
-    public static boolean hasRole(String role) {
+    public static String getCurrentUserName() {
+        CustomUserDetails userDetails = getCurrentUser();
+        return userDetails != null ? userDetails.getName() : null;
+    }
+
+    /**
+     * Check if the current user has a specific role/authority.
+     *
+     * @param authority the authority name (e.g., "ADMIN", "VIEWER")
+     * @return true if the user has the authority
+     */
+    public static boolean hasAuthority(String authority) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return false;
         }
         return authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals(role));
+                .anyMatch(a -> a.getAuthority().equals(authority));
     }
 }

@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 public class AuthService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+    private static final String DEFAULT_ROLE = "VIEWER";
 
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
@@ -55,12 +56,12 @@ public class AuthService {
     }
 
     /**
-     * Authenticate a user and return JWT tokens.
+     * Authenticate a user by email and return JWT tokens.
      */
     public AuthResponse login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
+                        loginRequest.getEmail(),
                         loginRequest.getPassword()
                 )
         );
@@ -75,13 +76,13 @@ public class AuthService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
 
-        logger.info("User '{}' logged in successfully", loginRequest.getUsername());
+        logger.info("User '{}' logged in successfully", loginRequest.getEmail());
 
         return new AuthResponse(
                 accessToken,
                 refreshToken,
                 userDetails.getId(),
-                userDetails.getUsername(),
+                userDetails.getName(),
                 userDetails.getEmail(),
                 roles
         );
@@ -92,11 +93,6 @@ public class AuthService {
      */
     @Transactional
     public UserResponse register(RegisterRequest registerRequest) {
-        // Check for duplicate username
-        if (userRepository.existsByUsername(registerRequest.getUsername())) {
-            throw new ResourceAlreadyExistsException("User", "username", registerRequest.getUsername());
-        }
-
         // Check for duplicate email
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new ResourceAlreadyExistsException("User", "email", registerRequest.getEmail());
@@ -104,12 +100,11 @@ public class AuthService {
 
         // Create user entity
         User user = new User(
-                registerRequest.getUsername(),
+                registerRequest.getName(),
                 registerRequest.getEmail(),
                 passwordEncoder.encode(registerRequest.getPassword())
         );
-        user.setFirstName(registerRequest.getFirstName());
-        user.setLastName(registerRequest.getLastName());
+        user.setPhone(registerRequest.getPhone());
 
         // Assign roles
         Set<Role> roles = new HashSet<>();
@@ -120,15 +115,16 @@ public class AuthService {
                 roles.add(role);
             }
         } else {
-            // Default to ROLE_USER
-            Role defaultRole = roleRepository.findByName("ROLE_USER")
-                    .orElseThrow(() -> new BadRequestException("Default role ROLE_USER not found. Please run database migrations."));
+            // Default to VIEWER role
+            Role defaultRole = roleRepository.findByName(DEFAULT_ROLE)
+                    .orElseThrow(() -> new BadRequestException(
+                            "Default role " + DEFAULT_ROLE + " not found. Please run database migrations."));
             roles.add(defaultRole);
         }
         user.setRoles(roles);
 
         User savedUser = userRepository.save(user);
-        logger.info("User '{}' registered successfully", savedUser.getUsername());
+        logger.info("User '{}' registered successfully", savedUser.getEmail());
 
         Set<String> roleNames = savedUser.getRoles().stream()
                 .map(Role::getName)
@@ -136,10 +132,9 @@ public class AuthService {
 
         return new UserResponse(
                 savedUser.getId(),
-                savedUser.getUsername(),
+                savedUser.getName(),
                 savedUser.getEmail(),
-                savedUser.getFirstName(),
-                savedUser.getLastName(),
+                savedUser.getPhone(),
                 savedUser.isActive(),
                 roleNames
         );

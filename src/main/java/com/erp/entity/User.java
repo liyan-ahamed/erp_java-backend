@@ -6,13 +6,15 @@ import java.util.Set;
 
 /**
  * User entity representing system users.
+ * Fields: id, name, email, password, phone, isActive, createdAt, updatedAt, createdBy, updatedBy.
+ * Audit fields (id, createdAt, updatedAt, createdBy, updatedBy) are inherited from BaseEntity.
  */
 @Entity
 @Table(name = "users")
 public class User extends BaseEntity {
 
-    @Column(name = "username", nullable = false, unique = true, length = 50)
-    private String username;
+    @Column(name = "name", nullable = false, length = 100)
+    private String name;
 
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
@@ -20,11 +22,8 @@ public class User extends BaseEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "first_name", length = 50)
-    private String firstName;
-
-    @Column(name = "last_name", length = 50)
-    private String lastName;
+    @Column(name = "phone", length = 20)
+    private String phone;
 
     @Column(name = "is_active", nullable = false)
     private boolean active = true;
@@ -40,8 +39,8 @@ public class User extends BaseEntity {
     public User() {
     }
 
-    public User(String username, String email, String password) {
-        this.username = username;
+    public User(String name, String email, String password) {
+        this.name = name;
         this.email = email;
         this.password = password;
     }
@@ -58,12 +57,12 @@ public class User extends BaseEntity {
 
     // Getters and Setters
 
-    public String getUsername() {
-        return username;
+    public String getName() {
+        return name;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {
@@ -82,20 +81,12 @@ public class User extends BaseEntity {
         this.password = password;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public boolean isActive() {

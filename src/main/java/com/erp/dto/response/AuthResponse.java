@@ -11,7 +11,7 @@ public class AuthResponse {
     private String refreshToken;
     private String tokenType = "Bearer";
     private Long userId;
-    private String username;
+    private String name;
     private String email;
     private Set<String> roles;
 
@@ -19,11 +19,11 @@ public class AuthResponse {
     }
 
     public AuthResponse(String accessToken, String refreshToken, Long userId,
-                        String username, String email, Set<String> roles) {
+                        String name, String email, Set<String> roles) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.userId = userId;
-        this.username = username;
+        this.name = name;
         this.email = email;
         this.roles = roles;
     }
@@ -62,12 +62,12 @@ public class AuthResponse {
         this.userId = userId;
     }
 
-    public String getUsername() {
-        return username;
+    public String getName() {
+        return name;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {

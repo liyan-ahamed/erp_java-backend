@@ -6,17 +6,17 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * Custom UserDetails implementation that wraps the User entity
  * and provides authorities from the user's roles.
+ * Uses email as the principal identifier (Spring Security's getUsername() returns email).
  */
 public class CustomUserDetails implements UserDetails {
 
     private final Long id;
-    private final String username;
+    private final String name;
     private final String email;
     private final String password;
     private final boolean active;
@@ -24,7 +24,7 @@ public class CustomUserDetails implements UserDetails {
 
     public CustomUserDetails(User user) {
         this.id = user.getId();
-        this.username = user.getUsername();
+        this.name = user.getName();
         this.email = user.getEmail();
         this.password = user.getPassword();
         this.active = user.isActive();
@@ -35,6 +35,10 @@ public class CustomUserDetails implements UserDetails {
 
     public Long getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getEmail() {
@@ -51,9 +55,12 @@ public class CustomUserDetails implements UserDetails {
         return password;
     }
 
+    /**
+     * Returns email as the principal identifier used by Spring Security.
+     */
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override
