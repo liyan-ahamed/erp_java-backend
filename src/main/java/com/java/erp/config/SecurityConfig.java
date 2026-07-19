@@ -40,7 +40,9 @@ public class SecurityConfig {
      * Whitelisted paths that do not require authentication.
      */
     private static final String[] PUBLIC_ENDPOINTS = {
-            "/auth/**",
+            "/auth/login",
+            "/auth/register",
+            "/auth/refresh",
             "/health/**",
             "/ping",
             "/v3/api-docs/**",

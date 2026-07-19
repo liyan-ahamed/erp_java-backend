@@ -1,31 +1,44 @@
 package com.java.erp.modules.auth.dto.response;
 
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * DTO for authentication responses containing JWT token and user info.
+ * DTO for authentication responses containing JWT tokens and user info.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthResponse {
 
+    @Schema(description = "JWT access token", example = "eyJhbGciOiJIUzI1NiJ9...")
     private String accessToken;
+
+    @Schema(description = "JWT refresh token", example = "eyJhbGciOiJIUzI1NiJ9...")
     private String refreshToken;
+
+    @Schema(description = "Token type", example = "Bearer")
     private String tokenType = "Bearer";
-    private Long userId;
-    private String name;
-    private String email;
-    private Set<String> roles;
+
+    @Schema(description = "Authenticated user details")
+    private UserResponse user;
 
     public AuthResponse() {
     }
 
-    public AuthResponse(String accessToken, String refreshToken, Long userId,
-                        String name, String email, Set<String> roles) {
+    /**
+     * Constructor for login responses (with user).
+     */
+    public AuthResponse(String accessToken, String refreshToken, UserResponse user) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
-        this.userId = userId;
-        this.name = name;
-        this.email = email;
-        this.roles = roles;
+        this.user = user;
+    }
+
+    /**
+     * Constructor for refresh responses (tokens only, no user).
+     */
+    public AuthResponse(String accessToken, String refreshToken) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 
     // Getters and Setters
@@ -54,35 +67,11 @@ public class AuthResponse {
         this.tokenType = tokenType;
     }
 
-    public Long getUserId() {
-        return userId;
+    public UserResponse getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Set<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<String> roles) {
-        this.roles = roles;
+    public void setUser(UserResponse user) {
+        this.user = user;
     }
 }

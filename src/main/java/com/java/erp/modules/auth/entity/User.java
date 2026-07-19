@@ -2,6 +2,8 @@ package com.java.erp.modules.auth.entity;
 
 import com.java.erp.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -44,6 +46,7 @@ public class User extends BaseEntity {
     private String designation;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "role", nullable = false, columnDefinition = "dept_role")
     private DeptRole deptRole = DeptRole.STAFF;
 

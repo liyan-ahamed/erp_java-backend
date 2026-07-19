@@ -45,14 +45,14 @@ VALUES
         NOW()
     );
 
--- Assign roles to the new users (ROLE_ADMIN for HOD, ROLE_USER for STAFF)
+-- Assign roles to the new users (ROLE_HOD for HOD, ROLE_STAFF for STAFF)
 INSERT INTO user_roles (user_id, role_id)
 SELECT u.id, r.id FROM users u, roles r
-WHERE u.email = 'hod@dept.edu' AND r.name = 'ROLE_ADMIN';
+WHERE u.email = 'hod@dept.edu' AND r.name = 'ROLE_HOD';
 
 INSERT INTO user_roles (user_id, role_id)
 SELECT u.id, r.id FROM users u, roles r
-WHERE u.email = 'priya.staff@dept.edu' AND r.name = 'ROLE_USER';
+WHERE u.email = 'priya.staff@dept.edu' AND r.name = 'ROLE_STAFF';
 
 -- =============================================
 -- 2. BATCHES (4 academic year groups)

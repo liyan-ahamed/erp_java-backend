@@ -58,10 +58,10 @@ public final class SecurityUtils {
     }
 
     /**
-     * Check if the current user has a specific role/authority.
+     * Checks if the current user has a specific authority (role).
      *
-     * @param authority the authority name (e.g., "ADMIN", "VIEWER")
-     * @return true if the user has the authority
+     * @param authority the authority name (e.g., "ROLE_HOD", "ROLE_STAFF")
+     * @return true if the user has the authority, false otherwise
      */
     public static boolean hasAuthority(String authority) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

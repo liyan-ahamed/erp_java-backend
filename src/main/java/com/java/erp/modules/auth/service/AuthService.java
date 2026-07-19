@@ -1,9 +1,12 @@
 package com.java.erp.modules.auth.service;
 
+import com.java.erp.exception.AccountDeactivatedException;
 import com.java.erp.exception.BadRequestException;
 import com.java.erp.exception.ConflictException;
 import com.java.erp.exception.ResourceNotFoundException;
+import com.java.erp.exception.UnauthorizedException;
 import com.java.erp.modules.auth.dto.request.LoginRequest;
+import com.java.erp.modules.auth.dto.request.RefreshTokenRequest;
 import com.java.erp.modules.auth.dto.request.RegisterRequest;
 import com.java.erp.modules.auth.dto.response.AuthResponse;
 import com.java.erp.modules.auth.dto.response.UserResponse;
@@ -18,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,13 +31,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Service handling authentication operations: login and registration.
+ * Service handling authentication operations: login, registration, token refresh.
  */
 @Service
 public class AuthService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
-    private static final String DEFAULT_ROLE = "VIEWER";
+    private static final String DEFAULT_ROLE = "ROLE_STAFF";
 
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
@@ -56,7 +58,7 @@ public class AuthService {
     }
 
     /**
-     * Authenticate a user by email and return JWT tokens.
+     * Authenticate a user by email and return JWT tokens with user info.
      */
     public AuthResponse login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -72,20 +74,54 @@ public class AuthService {
         String refreshToken = jwtService.generateRefreshToken(authentication);
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Set<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toSet());
+
+        // Load full user entity for the response
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+
+        UserResponse userResponse = buildUserResponse(user);
 
         logger.info("User '{}' logged in successfully", loginRequest.getEmail());
 
-        return new AuthResponse(
-                accessToken,
-                refreshToken,
-                userDetails.getId(),
-                userDetails.getName(),
-                userDetails.getEmail(),
-                roles
-        );
+        return new AuthResponse(accessToken, refreshToken, userResponse);
+    }
+
+    /**
+     * Refresh JWT tokens using a valid refresh token.
+     */
+    @Transactional(readOnly = true)
+    public AuthResponse refreshToken(RefreshTokenRequest request) {
+        String refreshToken = request.getRefreshToken();
+
+        // Validate the token
+        if (!jwtService.validateToken(refreshToken)) {
+            throw new UnauthorizedException("Invalid or expired refresh token.");
+        }
+
+        // Verify it is a REFRESH type token
+        String tokenType = jwtService.getTokenType(refreshToken);
+        if (!"REFRESH".equals(tokenType)) {
+            throw new UnauthorizedException("Invalid token type.");
+        }
+
+        // Extract email and load user
+        String email = jwtService.getEmailFromToken(refreshToken);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("Invalid or expired refresh token."));
+
+        // Check user is still active
+        if (!user.isActive()) {
+            throw new AccountDeactivatedException("Your account has been deactivated.");
+        }
+
+        // Generate new tokens
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        String newAccessToken = jwtService.generateAccessToken(userDetails);
+        String newRefreshToken = jwtService.generateRefreshToken(userDetails);
+
+        logger.info("Tokens refreshed for user '{}'", email);
+
+        return new AuthResponse(newAccessToken, newRefreshToken);
     }
 
     /**
@@ -115,7 +151,7 @@ public class AuthService {
                 roles.add(role);
             }
         } else {
-            // Default to VIEWER role
+            // Default to ROLE_STAFF role
             Role defaultRole = roleRepository.findByName(DEFAULT_ROLE)
                     .orElseThrow(() -> new BadRequestException(
                             "Default role " + DEFAULT_ROLE + " not found. Please run database migrations."));
@@ -126,16 +162,44 @@ public class AuthService {
         User savedUser = userRepository.save(user);
         logger.info("User '{}' registered successfully", savedUser.getEmail());
 
-        Set<String> roleNames = savedUser.getRoles().stream()
+        return buildUserResponse(savedUser);
+    }
+
+    /**
+     * Retrieve the currently authenticated user's information.
+     */
+    @Transactional(readOnly = true)
+    public UserResponse getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new UnauthorizedException("User is not authenticated");
+        }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+
+        return buildUserResponse(user);
+    }
+
+    /**
+     * Build a UserResponse DTO from a User entity.
+     */
+    private UserResponse buildUserResponse(User user) {
+        Set<String> roleNames = user.getRoles().stream()
                 .map(Role::getName)
                 .collect(Collectors.toSet());
 
         return new UserResponse(
-                savedUser.getId(),
-                savedUser.getName(),
-                savedUser.getEmail(),
-                savedUser.getPhone(),
-                savedUser.isActive(),
+                user.getId(),
+                user.getUsername(),
+                user.getName(),
+                user.getEmail(),
+                user.getStaffCode(),
+                user.getPhone(),
+                user.getDesignation(),
+                user.isActive(),
                 roleNames
         );
     }

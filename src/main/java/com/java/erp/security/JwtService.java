@@ -1,5 +1,7 @@
 package com.java.erp.security;
 
+import io.jsonwebtoken.Claims;
+
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -55,6 +57,20 @@ public class JwtService {
         return generateToken(userDetails.getUsername(), userDetails, refreshTokenExpirationMs, "REFRESH");
     }
 
+    /**
+     * Generate an access token directly from CustomUserDetails (used during token refresh).
+     */
+    public String generateAccessToken(CustomUserDetails userDetails) {
+        return generateToken(userDetails.getUsername(), userDetails, accessTokenExpirationMs, "ACCESS");
+    }
+
+    /**
+     * Generate a refresh token directly from CustomUserDetails (used during token refresh).
+     */
+    public String generateRefreshToken(CustomUserDetails userDetails) {
+        return generateToken(userDetails.getUsername(), userDetails, refreshTokenExpirationMs, "REFRESH");
+    }
+
     private String generateToken(String subject, CustomUserDetails userDetails, long expirationMs, String tokenType) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);
@@ -86,6 +102,18 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+    }
+
+    /**
+     * Extract the token type claim (ACCESS or REFRESH) from a JWT token.
+     */
+    public String getTokenType(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.get("tokenType", String.class);
     }
 
     /**

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.util.Set;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * DTO for user registration requests.
@@ -27,6 +28,7 @@ public class RegisterRequest {
     @Size(max = 20, message = "Phone must not exceed 20 characters")
     private String phone;
 
+    @Schema(example = "[\"ROLE_STAFF\"]")
     private Set<String> roles;
 
     public RegisterRequest() {
