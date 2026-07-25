@@ -77,4 +77,15 @@ public class AuthController {
         UserResponse userResponse = authService.getCurrentUser();
         return ResponseEntity.ok(ApiResponse.success("Current user fetched successfully", userResponse));
     }
+
+    @PostMapping("/logout")
+    @Operation(summary = "Logout user", description = "Logout the currently authenticated user by clearing the security context")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Logout successful"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Not authenticated")
+    })
+    public ResponseEntity<ApiResponse<Void>> logout() {
+        authService.logout();
+        return ResponseEntity.ok(ApiResponse.success("Logout successful", null));
+    }
 }

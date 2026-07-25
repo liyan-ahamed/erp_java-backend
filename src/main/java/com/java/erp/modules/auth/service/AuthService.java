@@ -184,6 +184,17 @@ public class AuthService {
     }
 
     /**
+     * Logout the currently authenticated user.
+     */
+    public void logout() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal())) {
+            logger.info("User '{}' logged out", authentication.getName());
+        }
+        SecurityContextHolder.clearContext();
+    }
+
+    /**
      * Build a UserResponse DTO from a User entity.
      */
     private UserResponse buildUserResponse(User user) {
