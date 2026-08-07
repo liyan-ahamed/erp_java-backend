@@ -19,6 +19,7 @@ import java.io.IOException;
 /**
  * JWT authentication filter that processes incoming requests,
  * extracts and validates JWT tokens, and sets the authentication context.
+ * Rejects blacklisted tokens and REFRESH tokens used as access tokens.
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -29,11 +30,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     public JwtAuthenticationFilter(JwtService jwtService,
-                                   CustomUserDetailsService userDetailsService) {
+                                   CustomUserDetailsService userDetailsService,
+                                   TokenBlacklistService tokenBlacklistService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Override
@@ -44,16 +48,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = extractTokenFromRequest(request);
 
             if (StringUtils.hasText(jwt) && jwtService.validateToken(jwt)) {
-                String email = jwtService.getEmailFromToken(jwt);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                // Reject blacklisted tokens
+                if (tokenBlacklistService.isBlacklisted(jwt)) {
+                    logger.debug("Rejected blacklisted token");
+                } else {
+                    // Reject REFRESH tokens used as access tokens
+                    String tokenType = jwtService.getTokenType(jwt);
+                    if ("REFRESH".equals(tokenType)) {
+                        logger.debug("Rejected REFRESH token used as access token");
+                    } else {
+                        String email = jwtService.getEmailFromToken(jwt);
+                        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request));
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails, null, userDetails.getAuthorities());
+                        authentication.setDetails(
+                                new WebAuthenticationDetailsSource().buildDetails(request));
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
             }
         } catch (Exception ex) {
             logger.error("Could not set user authentication in security context", ex);

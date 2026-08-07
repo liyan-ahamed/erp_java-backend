@@ -58,7 +58,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
      */
     @Query("SELECT s FROM Schedule s " +
            "WHERE s.createdByUser.id = :userId " +
-           "AND s.completed = false " +
+           "AND s.status != com.java.erp.modules.schedule.entity.ScheduleStatus.COMPLETED " +
+           "AND s.status != com.java.erp.modules.schedule.entity.ScheduleStatus.CANCELLED " +
            "AND (s.scheduleDate < :currentDate " +
            "     OR (s.scheduleDate = :currentDate AND s.scheduleTime < :currentTime))")
     List<Schedule> findPastDueActiveByCreator(@Param("userId") Long userId,
@@ -75,7 +76,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
      */
     @Query("SELECT s FROM Schedule s " +
            "WHERE s.createdByUser.id = :userId " +
-           "AND s.completed = false " +
+           "AND s.status != com.java.erp.modules.schedule.entity.ScheduleStatus.COMPLETED " +
+           "AND s.status != com.java.erp.modules.schedule.entity.ScheduleStatus.CANCELLED " +
            "AND (:type IS NULL OR s.scheduleType = :type) " +
            "ORDER BY s.scheduleDate DESC, s.scheduleTime DESC")
     List<Schedule> findActiveByCreatorAndOptionalType(@Param("userId") Long userId,
@@ -93,7 +95,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
      */
     @Query("SELECT s FROM Schedule s " +
            "WHERE s.createdByUser.id = :userId " +
-           "AND s.completed = true " +
+           "AND s.status = com.java.erp.modules.schedule.entity.ScheduleStatus.COMPLETED " +
            "AND (:type IS NULL OR s.scheduleType = :type) " +
            "ORDER BY s.scheduleDate DESC, s.scheduleTime DESC")
     List<Schedule> findCompletedByCreatorAndOptionalType(@Param("userId") Long userId,

@@ -71,4 +71,14 @@ public final class SecurityUtils {
         return authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals(authority));
     }
+
+    /**
+     * Checks if the current user has a specific permission.
+     *
+     * @param permission the permission name (e.g., "CREATE_SCHEDULE", "MANAGE_USERS")
+     * @return true if the user has the permission, false otherwise
+     */
+    public static boolean hasPermission(String permission) {
+        return hasAuthority(permission);
+    }
 }

@@ -1,17 +1,23 @@
 package com.java.erp.security;
 
+import com.java.erp.modules.auth.entity.Permission;
 import com.java.erp.modules.auth.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Custom UserDetails implementation that wraps the User entity
- * and provides authorities from the user's roles.
+ * and provides authorities from both roles AND permissions.
  * Uses email as the principal identifier (Spring Security's getUsername() returns email).
+ *
+ * Authorities include:
+ * - Role-based: ROLE_HOD, ROLE_STAFF (from user.roles)
+ * - Permission-based: CREATE_SCHEDULE, MANAGE_USERS, etc. (from role.permissions)
  */
 public class CustomUserDetails implements UserDetails {
 
@@ -28,9 +34,23 @@ public class CustomUserDetails implements UserDetails {
         this.email = user.getEmail();
         this.password = user.getPassword();
         this.active = user.isActive();
-        this.authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .collect(Collectors.toSet());
+
+        // Collect both role authorities and permission authorities
+        Set<GrantedAuthority> authoritySet = new HashSet<>();
+
+        user.getRoles().forEach(role -> {
+            // Add role authority (e.g., ROLE_HOD)
+            authoritySet.add(new SimpleGrantedAuthority(role.getName()));
+
+            // Add permission authorities (e.g., CREATE_SCHEDULE, MANAGE_USERS)
+            if (role.getPermissions() != null) {
+                role.getPermissions().forEach(permission ->
+                        authoritySet.add(new SimpleGrantedAuthority(permission.getName()))
+                );
+            }
+        });
+
+        this.authorities = authoritySet;
     }
 
     public Long getId() {

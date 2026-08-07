@@ -24,6 +24,15 @@ public class ScheduleResponse {
     @JsonProperty("schedule_time")
     private LocalTime scheduleTime;
 
+    @JsonProperty("end_time")
+    private LocalTime endTime;
+
+    private String location;
+    
+    private String status;
+    
+    private String priority;
+
     @JsonProperty("staff_id")
     private Long staffId;
 
@@ -44,6 +53,7 @@ public class ScheduleResponse {
 
     public ScheduleResponse(Long id, String scheduleType, String title,
                              LocalDate scheduleDate, LocalTime scheduleTime,
+                             LocalTime endTime, String location, String status, String priority,
                              Long staffId, String staffName,
                              Long createdBy, String createdByName,
                              LocalDateTime createdAt) {
@@ -52,6 +62,10 @@ public class ScheduleResponse {
         this.title = title;
         this.scheduleDate = scheduleDate;
         this.scheduleTime = scheduleTime;
+        this.endTime = endTime;
+        this.location = location;
+        this.status = status;
+        this.priority = priority;
         this.staffId = staffId;
         this.staffName = staffName;
         this.createdBy = createdBy;
@@ -139,5 +153,37 @@ public class ScheduleResponse {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
     }
 }

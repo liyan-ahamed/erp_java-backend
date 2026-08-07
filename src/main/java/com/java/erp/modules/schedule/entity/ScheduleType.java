@@ -5,5 +5,10 @@ package com.java.erp.modules.schedule.entity;
  */
 public enum ScheduleType {
     DEADLINE,
-    MEETING
+    MEETING,
+    EXAM,
+    LECTURE,
+    EVENT,
+    LAB,
+    APPOINTMENT
 }

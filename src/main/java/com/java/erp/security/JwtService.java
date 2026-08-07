@@ -139,4 +139,16 @@ public class JwtService {
         }
         return false;
     }
+
+    /**
+     * Extract the expiration date from a JWT token.
+     */
+    public Date getExpirationFromToken(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getExpiration();
+    }
 }

@@ -34,6 +34,20 @@ public class CreateScheduleRequest {
     @NotNull(message = "Time is required")
     private LocalTime time;
 
+    @JsonProperty("end_time")
+    private LocalTime endTime;
+
+    private String description;
+
+    private String location;
+
+    private String priority;
+
+    @JsonProperty("recurrence_rule")
+    private String recurrenceRule;
+
+    private String agenda;
+
     public CreateScheduleRequest() {
     }
 
@@ -77,5 +91,53 @@ public class CreateScheduleRequest {
 
     public void setTime(LocalTime time) {
         this.time = time;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+
+    public String getRecurrenceRule() {
+        return recurrenceRule;
+    }
+
+    public void setRecurrenceRule(String recurrenceRule) {
+        this.recurrenceRule = recurrenceRule;
+    }
+
+    public String getAgenda() {
+        return agenda;
+    }
+
+    public void setAgenda(String agenda) {
+        this.agenda = agenda;
     }
 }
