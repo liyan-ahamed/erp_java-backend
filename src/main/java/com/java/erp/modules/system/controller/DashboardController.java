@@ -27,7 +27,7 @@ public class DashboardController {
     }
 
     @GetMapping("/summary")
-    @PreAuthorize("hasAnyRole('HOD', 'STAFF')")
+    @PreAuthorize("hasAnyRole('HOD', 'STAFF', 'STUDENT')")
     @Operation(summary = "Get dashboard summary",
                description = "Returns total students, total staff, year-wise and section-wise student counts")
     @ApiResponses(value = {

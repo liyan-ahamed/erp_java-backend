@@ -231,6 +231,13 @@ public class UserService {
             roles.add(defaultRole);
         }
         user.setRoles(roles);
+        if (roles.stream().anyMatch(role -> "ROLE_STUDENT".equals(role.getName()))) {
+            user.setDeptRole(User.DeptRole.STUDENT);
+        } else if (roles.stream().anyMatch(role -> "ROLE_HOD".equals(role.getName()))) {
+            user.setDeptRole(User.DeptRole.HOD);
+        } else {
+            user.setDeptRole(User.DeptRole.STAFF);
+        }
     }
 
     /**

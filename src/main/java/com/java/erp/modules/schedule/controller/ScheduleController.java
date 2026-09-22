@@ -36,8 +36,10 @@ public class ScheduleController {
         this.scheduleService = scheduleService;
     }
 
-    @GetMapping("/staff")
-    @PreAuthorize("hasAuthority('CREATE_SCHEDULE') or hasAuthority('EDIT_SCHEDULE')")
+    // Legacy HOD -> Staff target lookup. Restore these mapping/security annotations
+    // together with the legacy create endpoint below if that workflow returns.
+    // @GetMapping("/staff")
+    // @PreAuthorize("hasAuthority('CREATE_SCHEDULE') or hasAuthority('EDIT_SCHEDULE')")
     @Operation(summary = "Get all staff members",
                description = "Returns all active staff members for schedule assignment")
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllStaff() {
@@ -48,8 +50,9 @@ public class ScheduleController {
         return ResponseEntity.ok(ApiResponse.success("Staff list fetched successfully", response));
     }
 
-    @PostMapping
-    @PreAuthorize("hasAuthority('CREATE_SCHEDULE')")
+    // Legacy HOD -> Staff schedule creation retained for future restoration.
+    // @PostMapping
+    // @PreAuthorize("hasAuthority('CREATE_SCHEDULE')")
     @Operation(summary = "Create schedule(s)",
                description = "Create schedule(s) for one or more staff members")
     public ResponseEntity<ApiResponse<List<ScheduleResponse>>> createSchedules(

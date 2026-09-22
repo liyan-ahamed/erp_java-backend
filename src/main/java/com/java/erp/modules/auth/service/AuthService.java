@@ -173,6 +173,13 @@ public class AuthService {
             roles.add(defaultRole);
         }
         user.setRoles(roles);
+        if (roles.stream().anyMatch(role -> "ROLE_STUDENT".equals(role.getName()))) {
+            user.setDeptRole(User.DeptRole.STUDENT);
+        } else if (roles.stream().anyMatch(role -> "ROLE_HOD".equals(role.getName()))) {
+            user.setDeptRole(User.DeptRole.HOD);
+        } else {
+            user.setDeptRole(User.DeptRole.STAFF);
+        }
 
         User savedUser = userRepository.save(user);
         logger.info("User '{}' registered successfully", savedUser.getEmail());

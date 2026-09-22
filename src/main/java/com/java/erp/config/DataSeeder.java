@@ -4,6 +4,7 @@ import com.java.erp.modules.auth.entity.Role;
 import com.java.erp.modules.auth.entity.User;
 import com.java.erp.modules.auth.repository.RoleRepository;
 import com.java.erp.modules.auth.repository.UserRepository;
+import com.java.erp.modules.system.repository.StudentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -24,13 +25,16 @@ public class DataSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final StudentRepository studentRepository;
 
     public DataSeeder(UserRepository userRepository,
                       RoleRepository roleRepository,
-                      PasswordEncoder passwordEncoder) {
+                      PasswordEncoder passwordEncoder,
+                      StudentRepository studentRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.studentRepository = studentRepository;
     }
 
     @Override
@@ -59,6 +63,26 @@ public class DataSeeder implements CommandLineRunner {
                 User.DeptRole.STAFF,
                 "ROLE_STAFF"
         );
+
+        seedUser(
+                "aarav.sharma1@student.erp.com",
+                "reg2024a001",
+                "Aarav Sharma",
+                "password123",
+                "REG2024A001",
+                null,
+                "STUDENT",
+                User.DeptRole.STUDENT,
+                "ROLE_STUDENT"
+        );
+
+        userRepository.findByEmail("aarav.sharma1@student.erp.com").ifPresent(user ->
+                studentRepository.findByEmailIgnoreCase(user.getEmail()).ifPresent(student -> {
+                    if (student.getUser() == null) {
+                        student.setUser(user);
+                        studentRepository.save(student);
+                    }
+                }));
     }
 
     private void seedUser(String email, String username, String name,

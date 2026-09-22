@@ -21,7 +21,7 @@ public class User extends BaseEntity {
      * Department role enum — maps to PostgreSQL 'dept_role' enum type.
      */
     public enum DeptRole {
-        HOD, STAFF
+        HOD, STAFF, STUDENT
     }
 
     @Column(name = "username", nullable = false, unique = true, length = 50)

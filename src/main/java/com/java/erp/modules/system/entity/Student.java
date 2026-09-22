@@ -1,5 +1,6 @@
 package com.java.erp.modules.system.entity;
 
+import com.java.erp.modules.auth.entity.User;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,6 +24,10 @@ public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", unique = true)
+    private User user;
 
     @Column(name = "register_number", nullable = false, unique = true, length = 20)
     private String registerNumber;
@@ -110,6 +115,10 @@ public class Student {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public User getUser() { return user; }
+
+    public void setUser(User user) { this.user = user; }
 
     public String getRegisterNumber() {
         return registerNumber;

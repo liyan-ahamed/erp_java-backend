@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Collection;
 
 /**
  * Repository for Student entity.
@@ -13,6 +15,16 @@ import java.util.List;
  */
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long> {
+
+    List<Student> findByActiveTrueOrderByNameAsc();
+
+    List<Student> findBySectionIdAndActiveTrueOrderByNameAsc(Long sectionId);
+
+    Optional<Student> findByUserId(Long userId);
+
+    Optional<Student> findByEmailIgnoreCase(String email);
+
+    List<Student> findDistinctBySectionIdInAndActiveTrue(Collection<Long> sectionIds);
 
     /**
      * Count students grouped by academic year (batch current_year).
